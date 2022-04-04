@@ -14,7 +14,8 @@ class FormData(
 
 class Fields(
     @SerializedName("text") @Expose val text: String?,
-    @SerializedName("type") @Expose val type: String?
+    @SerializedName("type") @Expose val type: String?,
+    @SerializedName("mandatory") @Expose val mandatory: Boolean?
 )
 
 class Status(

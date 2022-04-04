@@ -6,5 +6,6 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class LoginTable(
-    @ColumnInfo(name = "auth_key") val authKey: String?
+    @PrimaryKey
+    @ColumnInfo(name = "auth_key") val authKey: String
 )
