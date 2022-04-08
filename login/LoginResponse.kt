@@ -6,9 +6,9 @@ import com.servicefinder.pilotonboarding.Status
 
 class LoginResponse (
     @SerializedName("status") @Expose val status: Status?,
-    @SerializedName("data") @Expose val data: LoginData?
+    @SerializedName("auth_key") @Expose val authKey: String?
 )
 
 class LoginData(
-    @SerializedName("auth_key") @Expose val authKey: String?
+
 )

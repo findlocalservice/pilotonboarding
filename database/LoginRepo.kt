@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.math.log
 
 class LoginRepo (val dataBase: AppDataBase){
     private val scope : CoroutineScope = CoroutineScope(Dispatchers.IO)
@@ -21,6 +22,10 @@ class LoginRepo (val dataBase: AppDataBase){
         scope.launch {
             dataBase.getLoginTable().insertAuthKey(loginData)
         }
+    }
+
+    fun deleteAuthKey(){
+
     }
 
 }

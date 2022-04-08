@@ -8,12 +8,13 @@ import kotlinx.coroutines.launch
 
 class LoginViewModel(val apiService: LoginApiService) : ViewModel(){
 
-    val loginReponseLiveData: MutableLiveData<LoginData?>? = null
+    val loginReponseLiveData =  MutableLiveData<String?>()
     fun submitPhoneNo(phone_no:String, password: String){
+        loginReponseLiveData?.value
         viewModelScope.launch {
             val response = apiService.submitPhoneNo(phone_no, password)
             if(response.isSuccessful && response.body()?.status?.code==ResponseCodes.SUCCESS){
-                loginReponseLiveData?.value = response.body()?.data
+                loginReponseLiveData?.value = response.body()?.authKey
             }
         }
     }

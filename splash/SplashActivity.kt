@@ -3,6 +3,7 @@ package com.servicefinder.pilotonboarding.splash
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
@@ -15,6 +16,8 @@ import com.servicefinder.pilotonboarding.login.LoginActivity
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity:AppCompatActivity() {
+    private val TAG = "SplashActivity"
+
     private var binding: ActivitySplashBinding? = null
     private var viewModel: SplashViewModel? = null
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,11 +25,13 @@ class SplashActivity:AppCompatActivity() {
         binding = DataBindingUtil.setContentView<ActivitySplashBinding>(this, R.layout.activity_splash)
         viewModel = ViewModelProvider(this, GlobalViewModelFactory()).get(SplashViewModel::class.java)
         RepoProvider(this).loginDataBase()?.getAuthKey()?.observe(this) {
-            if(it==null){
+            if(it.isNullOrEmpty()){
+                Log.i(TAG, "Starting login activity")
                 val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
                 finish()
             }else{
+                Log.i(TAG, "Starting main activity")
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
                 finish()

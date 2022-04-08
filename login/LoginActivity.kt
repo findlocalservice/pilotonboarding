@@ -28,8 +28,8 @@ class LoginActivity : AppCompatActivity() {
         }
 
         viewModel?.loginReponseLiveData?.observe(this){
-            if(it?.authKey != null){
-                RepoProvider(context = this).loginDataBase()?.setAuthKey(LoginTable(it.authKey))
+            if(it!= null){
+                RepoProvider(context = this).loginDataBase()?.setAuthKey(LoginTable(it))
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
                 finish()
