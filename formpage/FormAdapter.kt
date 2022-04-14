@@ -6,10 +6,10 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.servicefinder.pilotonboarding.Fields
+import com.servicefinder.pilotonboarding.form.Fields
 import com.servicefinder.pilotonboarding.R
 
-class FormAdapter(): RecyclerView.Adapter<FormAdapter.FormViewHolder>() {
+class FormAdapter: RecyclerView.Adapter<FormAdapter.FormViewHolder>() {
     private val formList = mutableListOf<Fields>()
     inner class FormViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
         val question = itemView.findViewById<TextView>(R.id.question)

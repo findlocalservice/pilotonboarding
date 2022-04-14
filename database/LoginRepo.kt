@@ -18,7 +18,15 @@ class LoginRepo (val dataBase: AppDataBase){
         return data
     }
 
-    fun setAuthKey(loginData: LoginTable){
+    fun clearLoginData(){
+        scope.launch {
+            dataBase.getLoginTable().clearLoginData()
+        }
+    }
+
+
+
+    fun setLoginData(loginData: LoginTable){
         scope.launch {
             dataBase.getLoginTable().insertAuthKey(loginData)
         }

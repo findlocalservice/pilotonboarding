@@ -1,18 +1,18 @@
 package com.servicefinder.pilotonboarding.database
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 import com.servicefinder.pilotonboarding.login.LoginData
 
 @Dao
 interface LoginDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAuthKey(loginData: LoginTable)
 
     @Query("SELECT auth_key from LoginTable")
     suspend fun getAuthKey(): String?
+
+    @Query("DELETE FROM LoginTable")
+    suspend fun clearLoginData(): Int
 
     @Delete
     suspend fun deleteAuthKey(loginData: LoginTable)

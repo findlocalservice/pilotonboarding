@@ -1,4 +1,4 @@
-package com.servicefinder.pilotonboarding
+package com.servicefinder.pilotonboarding.form
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName

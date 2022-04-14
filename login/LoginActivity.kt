@@ -2,13 +2,12 @@ package com.servicefinder.pilotonboarding.login
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.servicefinder.pilotonboarding.GlobalViewModelFactory
-import com.servicefinder.pilotonboarding.MainActivity
+import com.servicefinder.pilotonboarding.form.MainActivity
 import com.servicefinder.pilotonboarding.R
 import com.servicefinder.pilotonboarding.database.LoginTable
 import com.servicefinder.pilotonboarding.database.RepoProvider
@@ -29,7 +28,7 @@ class LoginActivity : AppCompatActivity() {
 
         viewModel?.loginReponseLiveData?.observe(this){
             if(it!= null){
-                RepoProvider(context = this).loginDataBase()?.setAuthKey(LoginTable(it))
+                RepoProvider(context = this).loginDataBase()?.setLoginData(LoginTable(it))
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
                 finish()
