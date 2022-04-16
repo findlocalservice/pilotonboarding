@@ -25,6 +25,7 @@ import com.servicefinder.pilotonboarding.databinding.FragmentServiceFormBinding
 import com.servicefinder.pilotonboarding.form.Form1Fragment
 import com.servicefinder.pilotonboarding.form.MainViewModel
 import com.servicefinder.pilotonboarding.form.StepsFragment
+import com.servicefinder.pilotonboarding.form.profile.ProfilePictureFragment
 
 class ServiceFormFragment : Fragment() {
 
@@ -94,8 +95,9 @@ class ServiceFormFragment : Fragment() {
         viewModel?.serviceForLiveData?.observe(viewLifecycleOwner) {
             when (it.status) {
                 Resource.Status.SUCCESS -> {
+                    val fragment = ProfilePictureFragment.newInstance(phoneNo!!)
                     parentFragmentManager.beginTransaction()
-                        .replace(R.id.container, StepsFragment(), Form1Fragment::javaClass.name)
+                        .replace(R.id.container, fragment, fragment::class.java.simpleName)
                         .commitNow()
                 }
                 Resource.Status.ERROR -> {

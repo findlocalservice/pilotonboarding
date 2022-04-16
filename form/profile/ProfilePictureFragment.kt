@@ -12,13 +12,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.servicefinder.pilotonboarding.R
 import com.servicefinder.pilotonboarding.common.FileUtils
+import com.servicefinder.pilotonboarding.common.ImageUploader
+import com.servicefinder.pilotonboarding.common.PhotoUploader
 import com.servicefinder.pilotonboarding.databinding.FragmentProofilePictureBinding
+import com.servicefinder.pilotonboarding.form.StepsFragment
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.lang.Exception
-import kotlin.math.PI
 
 class ProfilePictureFragment : Fragment() {
     private var phoneNo: String? = null
@@ -41,7 +43,7 @@ class ProfilePictureFragment : Fragment() {
         }
 
         binding?.uploadPicButton?.setOnClickListener {
-            val intent =Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             intent.type = "image/*"
             val chooserIntent = Intent.createChooser(intent, "Select Image")
             startActivityForResult(chooserIntent, PICK_IMAGE)
@@ -65,6 +67,15 @@ class ProfilePictureFragment : Fragment() {
                     try {
                         val uri = data?.data
                         if (uri != null) {
+                            val filePath1 = arrayOf(MediaStore.Images.Media.DATA)
+                            val cursor =
+                                context?.contentResolver?.query(uri, filePath1, null, null, null)
+                            cursor?.moveToFirst();
+                            val columnIndex: Int? = cursor?.getColumnIndex(filePath1.get(0))
+                            val picturePath: String? = columnIndex?.let { cursor?.getString(it) }
+                            cursor?.close()
+                            val thumbnail = BitmapFactory.decodeFile(picturePath)
+                            binding?.imageView?.setImageBitmap(thumbnail)
                             val filePath = context?.let { FileUtils.getPath(context, uri) } ?: ""
                             val file = File(filePath)
                             val resolver = requireContext().contentResolver
@@ -84,6 +95,23 @@ class ProfilePictureFragment : Fragment() {
                                 inputStream.copyTo(outputStream)
                                 val bitmap = BitmapFactory.decodeFile(newFile.path)
                                 binding?.imageView?.setImageBitmap(bitmap)
+                                binding?.imageView?.visibility = View.VISIBLE
+                                val photoUploader = PhotoUploader(
+                                    file, "", object : ImageUploader {
+                                        override fun httpCodeResponse(code: Int) {
+                                            if (code == 200) {
+                                                gotoNextFragment()
+                                            } else {
+                                                Toast.makeText(
+                                                    context,
+                                                    "image upload failed",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                        }
+                                    }
+                                )
+                                photoUploader.startUpload()
                             }
                         }
                     } catch (ex: Exception) {
@@ -92,6 +120,13 @@ class ProfilePictureFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun gotoNextFragment() {
+        val fragment = StepsFragment()
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.container, fragment, fragment::class.java.simpleName).commitNow()
+
     }
 
 

@@ -25,39 +25,6 @@ public class FileUtils {
     private static final String TAG = FileUtils.class.getSimpleName();
     public static final String LOCALITIES_FILE_NAME = "locality_boundaries.txt";
 
-    @NonNull
-    public static RequestBody createPartFromString(String descriptionString) {
-        return RequestBody.create(
-                MediaType.parse(MULTIPART_FORM_DATA), descriptionString);
-    }
-
-    @NonNull
-    public static MultipartBody.Part prepareFilePartByPath(String partName, String path) {
-        // https://github.com/iPaulPro/aFileChooser/blob/master/aFileChooser/src/com/ipaulpro/afilechooser/utils/FileUtils.java
-        // use the FileUtils to get the actual file by uri
-        File file = new File(path);
-
-        // create RequestBody instance from file
-        RequestBody requestFile =
-                RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), file);
-
-        // MultipartBody.Part is used to send also the actual file name
-        return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
-    }
-
-    @NonNull
-    public static MultipartBody.Part prepareFilePart(Context context, String partName, Uri fileUri) {
-        // https://github.com/iPaulPro/aFileChooser/blob/master/aFileChooser/src/com/ipaulpro/afilechooser/utils/FileUtils.java
-        // use the FileUtils to get the actual file by uri
-        File file = new File(FileUtils.getPath(context, fileUri));
-
-        // create RequestBody instance from file
-        RequestBody requestFile =
-                RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), file);
-
-        // MultipartBody.Part is used to send also the actual file name
-        return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
-    }
 
     /**
      * Method for return file path of Gallery image
