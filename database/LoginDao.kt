@@ -1,7 +1,6 @@
 package com.servicefinder.pilotonboarding.database
 
 import androidx.room.*
-import com.servicefinder.pilotonboarding.login.LoginData
 
 @Dao
 interface LoginDao {

@@ -1,5 +1,6 @@
 package com.servicefinder.pilotonboarding.login
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,9 +13,13 @@ class LoginViewModel(val apiService: LoginApiService) : ViewModel(){
     fun submitPhoneNo(phone_no:String, password: String){
         loginReponseLiveData?.value
         viewModelScope.launch {
-            val response = apiService.submitPhoneNo(phone_no, password)
-            if(response.isSuccessful && response.body()?.status?.code==ResponseCodes.SUCCESS){
-                loginReponseLiveData?.value = response.body()?.authKey
+            try {
+                val response = apiService.submitPhoneNo(phone_no, password)
+                if(response.isSuccessful && response.body()?.status?.code==ResponseCodes.SUCCESS){
+                    loginReponseLiveData?.value = response.body()?.authKey
+                }
+            }catch(ex: Exception){
+                Log.i("LoginViewModel", ex.message.toString())
             }
         }
     }

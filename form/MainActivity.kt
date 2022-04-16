@@ -1,10 +1,12 @@
 package com.servicefinder.pilotonboarding.form
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import com.servicefinder.pilotonboarding.R
 import com.servicefinder.pilotonboarding.databinding.ActivityMainBinding
+import com.servicefinder.pilotonboarding.form.serviceform.ServiceFormFragment
 
 
 class MainActivity : AppCompatActivity() {
@@ -14,9 +16,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding?.root)
-        supportFragmentManager.beginTransaction().add(R.id.container, Form1Fragment())
+        supportFragmentManager.beginTransaction().add(R.id.container, StepsFragment())
             .commitAllowingStateLoss()
-        binding?.bottomNavView?.setOnNavigationItemReselectedListener {
+        binding?.bottomNavView?.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.form -> {
                     gotoForm()
@@ -24,19 +26,29 @@ class MainActivity : AppCompatActivity() {
                 R.id.edit -> {
                     goToEditForm()
                 }
+                else ->{
+
+                }
             }
+            return@setOnItemSelectedListener true
         }
     }
 
     private fun gotoForm() {
         Log.i(TAG, "Starting form1 fragment")
-        supportFragmentManager.beginTransaction().replace(R.id.container, Form1Fragment())
-            .commitAllowingStateLoss()
+        val fragment = StepsFragment()
+        supportFragmentManager.beginTransaction().replace(R.id.container, fragment, fragment.javaClass.simpleName)
+            .commitNow()
     }
 
     private fun goToEditForm() {
         Log.i(TAG, "Starting form2 fragment")
-        supportFragmentManager.beginTransaction().replace(R.id.container, EditFormFragment())
-            .commitAllowingStateLoss()
+        val fragment  = EditFormFragment()
+        supportFragmentManager.beginTransaction().replace(R.id.container, fragment, fragment.javaClass.simpleName)
+            .commitNow()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
     }
 }

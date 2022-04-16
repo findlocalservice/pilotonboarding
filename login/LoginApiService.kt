@@ -8,7 +8,7 @@ import retrofit2.http.Query
 interface LoginApiService {
     @POST("admin/login")
     suspend fun submitPhoneNo(
-        @Query("phone_no") phone_no: String,
+        @Query("phone_number") phone_no: String,
         @Query("password") password: String
     ): Response<LoginResponse>
 }

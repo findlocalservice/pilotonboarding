@@ -8,7 +8,3 @@ class LoginResponse (
     @SerializedName("status") @Expose val status: Status?,
     @SerializedName("auth_key") @Expose val authKey: String?
 )
-
-class LoginData(
-
-)

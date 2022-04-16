@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.servicefinder.pilotonboarding.GlobalViewModelFactory
 import com.servicefinder.pilotonboarding.form.MainActivity
 import com.servicefinder.pilotonboarding.R
+import com.servicefinder.pilotonboarding.common.SharedPreferences
 import com.servicefinder.pilotonboarding.database.LoginTable
 import com.servicefinder.pilotonboarding.database.RepoProvider
 import com.servicefinder.pilotonboarding.databinding.ActivityLoginBinding
@@ -29,6 +30,7 @@ class LoginActivity : AppCompatActivity() {
         viewModel?.loginReponseLiveData?.observe(this){
             if(it!= null){
                 RepoProvider(context = this).loginDataBase()?.setLoginData(LoginTable(it))
+                SharedPreferences.addString("Auth_Key", it)
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
                 finish()
