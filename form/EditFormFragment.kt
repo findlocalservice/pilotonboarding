@@ -10,7 +10,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.servicefinder.pilotonboarding.GlobalViewModelFactory
 import com.servicefinder.pilotonboarding.R
+import com.servicefinder.pilotonboarding.common.Resource
 import com.servicefinder.pilotonboarding.databinding.FragmentEditformBinding
+import com.servicefinder.pilotonboarding.documents.DocumentUploadFragment
 import com.servicefinder.pilotonboarding.form.profile.ProfilePictureFragment
 import com.servicefinder.pilotonboarding.form.serviceform.ServiceFormFragment
 
@@ -35,9 +37,31 @@ class EditFormFragment : Fragment() {
         binding?.phoneNo?.addTextChangedListener {
             binding?.submitButton?.isEnabled = binding?.phoneNo?.text?.trim()?.length ?: 0 == 10
         }
+
+        viewModel?.phoneNumberAvailableLiveData?.observe(viewLifecycleOwner){
+            when(it.status){
+                Resource.Status.SUCCESS ->{
+                    binding?.progressBar?.visibility = View.GONE
+                    if(it.data==true){
+                        goToStep()
+                    }else{
+                        state = FragmentStates.start_onboarding.name
+                        Toast.makeText(context, "Phone number not registered", Toast.LENGTH_SHORT).show()
+                        goToStep()
+                    }
+                }
+                Resource.Status.ERROR ->{
+                    binding?.progressBar?.visibility = View.GONE
+                    Toast.makeText(context, "something went wrong", Toast.LENGTH_SHORT).show()
+                }
+                Resource.Status.LOADING ->{
+                    binding?.progressBar?.visibility = View.VISIBLE
+                }
+            }
+        }
         binding?.submitButton?.setOnClickListener {
             if (binding?.phoneNo?.text?.trim()?.length ?: 0 == 10) {
-                goToStep()
+                viewModel?.checkPhoneNumberIsAvailable(binding?.phoneNo?.text?.trim().toString())
             } else {
                 Toast.makeText(context, "Enter valid number", Toast.LENGTH_SHORT).show()
             }
@@ -46,6 +70,10 @@ class EditFormFragment : Fragment() {
 
     private fun goToStep(){
         when(state){
+            FragmentStates.start_onboarding.name ->{
+                val fragment = Form1Fragment()
+                gotoFragment(fragment)
+            }
             FragmentStates.service_page.name ->{
                 val fragment = ServiceFormFragment.newInstance(binding?.phoneNo?.text?.trim().toString())
                 gotoFragment(fragment)
@@ -56,7 +84,8 @@ class EditFormFragment : Fragment() {
                 gotoFragment(fragment)
             }
             FragmentStates.documents_page.name ->{
-
+                val fragment = DocumentUploadFragment.newInstance(binding?.phoneNo?.text?.trim().toString())
+                gotoFragment(fragment)
             }
             else ->{
                 val fragment =  Form1Fragment()

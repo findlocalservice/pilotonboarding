@@ -1,15 +1,21 @@
 package com.servicefinder.pilotonboarding.form
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import com.servicefinder.pilotonboarding.GlobalViewModelFactory
 import com.servicefinder.pilotonboarding.R
+import com.servicefinder.pilotonboarding.database.LoginTable
+import com.servicefinder.pilotonboarding.database.RepoProvider
 import com.servicefinder.pilotonboarding.databinding.FragmentStepsBinding
+import com.servicefinder.pilotonboarding.login.LoginActivity
 
 class StepsFragment : Fragment() {
-
+    private var viewModel: MainViewModel? = null
     private var binding: FragmentStepsBinding? = null
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -18,6 +24,7 @@ class StepsFragment : Fragment() {
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         binding = FragmentStepsBinding.inflate(inflater)
+        viewModel = ViewModelProvider(this, GlobalViewModelFactory()).get(MainViewModel::class.java)
         return binding?.root
     }
 
@@ -44,8 +51,16 @@ class StepsFragment : Fragment() {
             val editFormFragment = EditFormFragment.newInstance(FragmentStates.documents_page.name)
             gotoFragment(editFormFragment)
         }
+        viewModel?.logoutData?.observe(viewLifecycleOwner) {
+            if (it) {
+                context?.let { it1 -> RepoProvider(it1).loginDataBase()?.clearLoginData() }
+                val intent = Intent(context, LoginActivity::class.java)
+                startActivity(intent)
+                activity?.finish()
+            }
+        }
         binding?.logout?.setOnClickListener {
-
+            viewModel?.logout()
         }
     }
 

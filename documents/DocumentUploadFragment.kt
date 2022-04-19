@@ -1,4 +1,4 @@
-package com.servicefinder.pilotonboarding.form.profile
+package com.servicefinder.pilotonboarding.documents
 
 import android.app.Activity
 import android.content.Intent
@@ -16,46 +16,44 @@ import androidx.lifecycle.ViewModelProvider
 import com.servicefinder.pilotonboarding.GlobalViewModelFactory
 import com.servicefinder.pilotonboarding.R
 import com.servicefinder.pilotonboarding.common.FileUtils
-import com.servicefinder.pilotonboarding.common.ImageUploader
-import com.servicefinder.pilotonboarding.common.PhotoUploader
 import com.servicefinder.pilotonboarding.common.Resource
-import com.servicefinder.pilotonboarding.databinding.FragmentProofilePictureBinding
-import com.servicefinder.pilotonboarding.documents.DocumentUploadFragment
+import com.servicefinder.pilotonboarding.databinding.FragmentDocumentBinding
 import com.servicefinder.pilotonboarding.form.MainViewModel
 import com.servicefinder.pilotonboarding.form.StepsFragment
+import com.servicefinder.pilotonboarding.form.profile.ProfilePictureFragment
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 
-class ProfilePictureFragment : Fragment() {
+class DocumentUploadFragment : Fragment() {
     private var phoneNo: String? = null
-    private var binding: FragmentProofilePictureBinding? = null
+    private var binding: FragmentDocumentBinding? = null
     private var viewModel: MainViewModel? = null
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentProofilePictureBinding.inflate(inflater)
-        viewModel = ViewModelProvider(this, GlobalViewModelFactory()).get(MainViewModel::class.java)
+        binding = FragmentDocumentBinding.inflate(inflater)
         phoneNo = arguments?.getString(phoneno)
+        viewModel = ViewModelProvider(this, GlobalViewModelFactory()).get(MainViewModel::class.java)
         return binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding?.uploadPicButton?.setOnClickListener {
+        binding?.uploadPhoto?.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             intent.type = "image/*"
             val chooserIntent = Intent.createChooser(intent, "Select Image")
-            startActivityForResult(chooserIntent, PICK_IMAGE)
+            startActivityForResult(chooserIntent, ProfilePictureFragment.PICK_IMAGE)
         }
 
-
-        viewModel?.profilePictureLiveData?.observe(viewLifecycleOwner){
+        viewModel?.documentUploadLiveData?.observe(viewLifecycleOwner){
             when(it.status){
                 Resource.Status.SUCCESS ->{
                     if(it.data == true){
+                        Toast.makeText(context, "Document submitted successfully", Toast.LENGTH_SHORT).show()
                         gotoNextFragment()
                     }else{
                         Toast.makeText(context, "something went wrong", Toast.LENGTH_SHORT).show()
@@ -64,41 +62,46 @@ class ProfilePictureFragment : Fragment() {
                 Resource.Status.ERROR ->{
                     Toast.makeText(context, "something went wrong", Toast.LENGTH_SHORT).show()
                 }
+
                 Resource.Status.LOADING ->{
 
                 }
             }
         }
+
+
         binding?.submit?.setOnClickListener {
-            when {
-                phoneNo == null -> {
-                    Toast.makeText(context, "phone no is null", Toast.LENGTH_SHORT).show()
-                }
-                photoFile == null -> {
-                    Toast.makeText(context, "phoneFile is null", Toast.LENGTH_SHORT).show()
-                }
-                else -> {
-                    viewModel?.uploadProfilePicture(phoneNo!!, photoFile!!)
-                }
+            if (isReadyToSubmitButton()) {
+                viewModel?.uploadDocument(
+                    phoneNo!!,
+                    binding?.documentName?.selectedItem as String,
+                    binding?.documentType?.selectedItem as String,
+                    binding?.documentId?.text?.toString()!!,
+                    photoFile!!
+                )
+            } else {
+                Toast.makeText(context, "Full details are not filled", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
+    private fun isReadyToSubmitButton(): Boolean {
+        if (phoneNo == null
+            || binding?.documentName?.selectedItem == null
+            || binding?.documentType?.selectedItem == null
+            || binding?.documentId?.text == null
+            || photoFile == null
+        ) {
+            return false
+        }
+        return true
+    }
 
     private var photoFile: File? = null
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
-            CAPTURE_IMAGE_INTENT -> {
-                if (resultCode == Activity.RESULT_OK) {
-                    val bitmap = data?.extras?.get("data") as Bitmap
-                    binding?.imageView?.apply {
-                        visibility = View.VISIBLE
-                        setImageBitmap(bitmap)
-                    }
-                }
-            }
-            PICK_IMAGE -> {
+            ProfilePictureFragment.PICK_IMAGE -> {
                 if (resultCode == Activity.RESULT_OK) {
                     try {
                         val uri = data?.data
@@ -111,7 +114,7 @@ class ProfilePictureFragment : Fragment() {
                             val picturePath: String? = columnIndex?.let { cursor?.getString(it) }
                             cursor?.close()
                             val thumbnail = BitmapFactory.decodeFile(picturePath)
-                            binding?.imageView?.setImageBitmap(thumbnail)
+                            binding?.imageview?.setImageBitmap(thumbnail)
                             val filePath = context?.let { FileUtils.getPath(context, uri) } ?: ""
                             val file = File(filePath)
                             val resolver = requireContext().contentResolver
@@ -131,8 +134,8 @@ class ProfilePictureFragment : Fragment() {
                                 inputStream.copyTo(outputStream)
                                 photoFile = newFile
                                 val bitmap = BitmapFactory.decodeFile(newFile.path)
-                                binding?.imageView?.setImageBitmap(bitmap)
-                                binding?.imageView?.visibility = View.VISIBLE
+                                binding?.imageview?.setImageBitmap(bitmap)
+                                binding?.imageview?.visibility = View.VISIBLE
                             }
                         }
                     } catch (ex: Exception) {
@@ -143,6 +146,7 @@ class ProfilePictureFragment : Fragment() {
         }
     }
 
+
     private fun gotoNextFragment() {
         val fragment = DocumentUploadFragment.newInstance(phoneNo!!)
         parentFragmentManager.beginTransaction()
@@ -150,17 +154,17 @@ class ProfilePictureFragment : Fragment() {
 
     }
 
-
     companion object {
         const val PICK_IMAGE = 1001
         const val CAPTURE_IMAGE_INTENT = 1000
         const val phoneno = "phone_no"
-        fun newInstance(phoneNo: String): ProfilePictureFragment {
-            return ProfilePictureFragment().apply {
+        fun newInstance(phone_no: String): DocumentUploadFragment {
+            return DocumentUploadFragment().apply {
                 val bundle = Bundle()
-                bundle.putString(phoneno, phoneNo)
+                bundle.putString(phoneno, phone_no)
                 arguments = bundle
             }
         }
     }
+
 }
