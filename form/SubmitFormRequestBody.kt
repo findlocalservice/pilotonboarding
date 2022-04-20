@@ -9,6 +9,7 @@ class SubmitForm1RequestBody (
     @SerializedName("address") @Expose val address: String?,
     @SerializedName("phone_number") @Expose val phoneNumber: String?,
     @SerializedName("gender") @Expose val gender: String?,
-    @SerializedName("alternate_phone_number") @Expose val alternatePhoneNo: String?
+    @SerializedName("alternate_phone_number") @Expose val alternatePhoneNo: String?,
+    @SerializedName("is_whatsapp_present") @Expose val isWhatsappPresent: Boolean?
 
 )

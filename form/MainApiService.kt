@@ -33,9 +33,9 @@ interface MainApiService {
     @POST("pilot/upload_document_data")
     suspend fun uploadDocuments(
         @Query("phone_number") phone_no: String,
-        @Query("doc_name") doc_name: String,
-        @Query ("doc_type") doc_type: String,
-        @Query ("doc_id") doc_id: String,
+        @Query("document_type") doc_name: String,
+        @Query ("document_filename") doc_type: String,
+        @Query ("document_id") doc_id: String,
         @Part image: MultipartBody.Part
     ): Response<GeneralResponse>
 }

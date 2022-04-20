@@ -52,6 +52,8 @@ class DocumentUploadFragment : Fragment() {
         viewModel?.documentUploadLiveData?.observe(viewLifecycleOwner){
             when(it.status){
                 Resource.Status.SUCCESS ->{
+                    binding?.progressBar?.visibility = View.GONE
+
                     if(it.data == true){
                         Toast.makeText(context, "Document submitted successfully", Toast.LENGTH_SHORT).show()
                         gotoNextFragment()
@@ -60,11 +62,12 @@ class DocumentUploadFragment : Fragment() {
                     }
                 }
                 Resource.Status.ERROR ->{
+                    binding?.progressBar?.visibility = View.GONE
                     Toast.makeText(context, "something went wrong", Toast.LENGTH_SHORT).show()
                 }
 
                 Resource.Status.LOADING ->{
-
+                    binding?.progressBar?.visibility = View.VISIBLE
                 }
             }
         }
@@ -75,7 +78,7 @@ class DocumentUploadFragment : Fragment() {
                 viewModel?.uploadDocument(
                     phoneNo!!,
                     binding?.documentName?.selectedItem as String,
-                    binding?.documentType?.selectedItem as String,
+                    "${binding?.documentName?.selectedItem}_${binding?.documentType?.selectedItem}.jpg" as String,
                     binding?.documentId?.text?.toString()!!,
                     photoFile!!
                 )

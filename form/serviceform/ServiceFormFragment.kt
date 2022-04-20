@@ -146,11 +146,10 @@ class ServiceFormFragment : Fragment() {
         )
 
 
-        return if (selectedWork == null ||
+        return if (
+            selectedWork == null ||
             listOfWorkTimings.isEmpty() ||
-            workExp.isNullOrEmpty() ||
-            monthlyEarning.isNullOrEmpty() ||
-            dailyEarning.isNullOrEmpty()
+            workExp.isNullOrEmpty()
         ) {
             return null
         } else {

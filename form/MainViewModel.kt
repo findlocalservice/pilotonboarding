@@ -116,7 +116,7 @@ class MainViewModel(val api: MainApiService) : ViewModel() {
         documentUploadLiveData.value = Resource.loading()
         viewModelScope.launch {
             val requestFile = file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
-            val body = MultipartBody.Part.createFormData("image", file.name, requestFile)
+            val body = MultipartBody.Part.createFormData("document_image", file.name, requestFile)
             try {
                 val response = api.uploadDocuments(phone_no, doc_name, doc_type, doc_id,  body)
                 if (response.isSuccessful && response.body()?.status?.code == 200) {

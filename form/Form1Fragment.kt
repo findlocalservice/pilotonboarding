@@ -60,8 +60,8 @@ class Form1Fragment : Fragment() {
                 val formattedDate = formatDateInDDMMYYYYDash(date)
                 binding?.dobAnswer?.setText(formattedDate.toString())
             }
-
         }
+
         binding?.submitButton?.setOnClickListener {
             if (formValidator()) {
                 val submitFormRequestBody = SubmitForm1RequestBody(
@@ -70,7 +70,8 @@ class Form1Fragment : Fragment() {
                     address = binding?.addressAnswer?.text?.trim().toString(),
                     phoneNumber = binding?.phoneNoAnswer?.text?.trim().toString(),
                     gender = binding?.phoneNoAnswer?.text?.trim().toString(),
-                    alternatePhoneNo = binding?.alternatePhoneNo?.text?.trim().toString()
+                    alternatePhoneNo = binding?.alternatePhoneNo?.text?.trim().toString(),
+                    isWhatsappPresent = binding?.whatsappCheckBox?.isChecked ?: false
                 )
                 viewModel?.submitForm1(submitFormRequestBody)
             } else {
