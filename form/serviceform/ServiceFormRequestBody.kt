@@ -9,6 +9,8 @@ class ServiceFormRequestBody(
     @SerializedName("service_timings") val serviceTimings: List<SelectedWorkTimings>?,
     @SerializedName("one_time_rates") val oneTmeRates: String?,
     @SerializedName("monthly_rates") val monthlyRates: String?,
+    @SerializedName("latitude") val latitude: Double?,
+    @SerializedName("longitude") val longitude: Double?
 )
 
 data class SelectedWorkTimings(

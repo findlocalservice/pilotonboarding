@@ -13,6 +13,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.servicefinder.pilotonboarding.GlobalViewModelFactory
 import com.servicefinder.pilotonboarding.R
 import com.servicefinder.pilotonboarding.common.Resource
+import com.servicefinder.pilotonboarding.common.SharedPreferences
 import com.servicefinder.pilotonboarding.databinding.FragmentFormBinding
 import com.servicefinder.pilotonboarding.form.serviceform.ServiceFormFragment
 import java.text.SimpleDateFormat
@@ -38,6 +39,7 @@ class Form1Fragment : Fragment() {
             when (it.status) {
                 Resource.Status.SUCCESS -> {
                     Toast.makeText(context, "Successfully submitted", Toast.LENGTH_SHORT).show()
+                    SharedPreferences.addString(SharedPreferences.phone_no, binding?.phoneNoAnswer?.text?.trim()?.toString())
                     val fragment = ServiceFormFragment.newInstance(
                         binding?.phoneNoAnswer?.text?.trim().toString()
                     )
@@ -69,7 +71,7 @@ class Form1Fragment : Fragment() {
                     dob = binding?.dobAnswer?.text?.trim().toString(),
                     address = binding?.addressAnswer?.text?.trim().toString(),
                     phoneNumber = binding?.phoneNoAnswer?.text?.trim().toString(),
-                    gender = binding?.phoneNoAnswer?.text?.trim().toString(),
+                    gender = binding?.genderAns?.selectedItem?.toString(),
                     alternatePhoneNo = binding?.alternatePhoneNo?.text?.trim().toString(),
                     isWhatsappPresent = binding?.whatsappCheckBox?.isChecked ?: false
                 )
@@ -91,7 +93,7 @@ class Form1Fragment : Fragment() {
             binding?.phoneNoAnswer?.text?.trim().isNullOrEmpty() ||
             binding?.addressAnswer?.text?.trim().isNullOrEmpty() ||
             binding?.dobAnswer?.text?.trim().isNullOrEmpty() ||
-            binding?.genderAns?.text?.trim().isNullOrEmpty()
+            binding?.genderAns?.selectedItem !=null
         ) {
             return false
         }

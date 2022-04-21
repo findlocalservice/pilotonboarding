@@ -20,6 +20,7 @@ import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.gson.annotations.SerializedName
 import com.servicefinder.pilotonboarding.GlobalViewModelFactory
 import com.servicefinder.pilotonboarding.R
+import com.servicefinder.pilotonboarding.common.LocationFetcher
 import com.servicefinder.pilotonboarding.common.Resource
 import com.servicefinder.pilotonboarding.databinding.FragmentServiceFormBinding
 import com.servicefinder.pilotonboarding.form.Form1Fragment
@@ -57,6 +58,12 @@ class ServiceFormFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        LocationFetcher.locationLiveData.observe(viewLifecycleOwner){
+            if(it!=null){
+                binding?.locationValues?.text = "${it?.latitude}, ${it?.longitude}"
+            }
+        }
+        context?.let { LocationFetcher.getDeviceLocation(it) }
         linearLayout = binding?.workTimingContainer
         binding?.workTimingAddButton?.setOnClickListener {
             val view1 = LinearLayout.inflate(context, R.layout.service_worktiming_layout, null)
@@ -95,16 +102,20 @@ class ServiceFormFragment : Fragment() {
         viewModel?.serviceForLiveData?.observe(viewLifecycleOwner) {
             when (it.status) {
                 Resource.Status.SUCCESS -> {
+                    binding?.progressBar?.visibility = View.GONE
+
                     val fragment = ProfilePictureFragment.newInstance(phoneNo!!)
                     parentFragmentManager.beginTransaction()
                         .replace(R.id.container, fragment, fragment::class.java.simpleName)
                         .commitNow()
                 }
                 Resource.Status.ERROR -> {
+                    binding?.progressBar?.visibility = View.GONE
+
                     Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show()
                 }
                 Resource.Status.LOADING -> {
-
+binding?.progressBar?.visibility = View.VISIBLE
                 }
             }
         }
@@ -142,7 +153,9 @@ class ServiceFormFragment : Fragment() {
             serviceTimings = listOfWorkTimings,
             monthlyRates = monthlyEarning,
             oneTmeRates = dailyEarning,
-            serviceType = selectedWork
+            serviceType = selectedWork,
+            latitude = LocationFetcher.locationLiveData.value?.latitude,
+            longitude = LocationFetcher.locationLiveData.value?.longitude
         )
 
 

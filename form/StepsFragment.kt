@@ -9,9 +9,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.servicefinder.pilotonboarding.GlobalViewModelFactory
 import com.servicefinder.pilotonboarding.R
+import com.servicefinder.pilotonboarding.common.SharedPreferences
 import com.servicefinder.pilotonboarding.database.LoginTable
 import com.servicefinder.pilotonboarding.database.RepoProvider
 import com.servicefinder.pilotonboarding.databinding.FragmentStepsBinding
+import com.servicefinder.pilotonboarding.documents.DocumentUploadFragment
+import com.servicefinder.pilotonboarding.form.profile.ProfilePictureFragment
+import com.servicefinder.pilotonboarding.form.serviceform.ServiceFormFragment
 import com.servicefinder.pilotonboarding.login.LoginActivity
 
 class StepsFragment : Fragment() {
@@ -37,19 +41,39 @@ class StepsFragment : Fragment() {
         }
 
         binding?.step2?.setOnClickListener {
-            val editFormFragment = EditFormFragment.newInstance(FragmentStates.service_page.name)
-            gotoFragment(editFormFragment)
+            val phone_no = SharedPreferences.getString(SharedPreferences.phone_no)
+            if (phone_no != null) {
+                val fragment = ServiceFormFragment.newInstance(phone_no)
+                gotoFragment(fragment)
+            } else {
+                val editFormFragment =
+                    EditFormFragment.newInstance(FragmentStates.service_page.name)
+                gotoFragment(editFormFragment)
+            }
         }
 
         binding?.step3?.setOnClickListener {
-            val editFormFragment =
-                EditFormFragment.newInstance(FragmentStates.profile_pic_page.name)
-            gotoFragment(editFormFragment)
+            val phone_no = SharedPreferences.getString(SharedPreferences.phone_no)
+            if (phone_no != null) {
+                val fragment = ProfilePictureFragment.newInstance(phone_no)
+                gotoFragment(fragment)
+            } else {
+                val editFormFragment =
+                    EditFormFragment.newInstance(FragmentStates.profile_pic_page.name)
+                gotoFragment(editFormFragment)
+            }
         }
 
         binding?.step4?.setOnClickListener {
-            val editFormFragment = EditFormFragment.newInstance(FragmentStates.documents_page.name)
-            gotoFragment(editFormFragment)
+            val phone_no = SharedPreferences.getString(SharedPreferences.phone_no)
+            if (phone_no != null) {
+                val fragment = DocumentUploadFragment.newInstance(phone_no)
+                gotoFragment(fragment)
+            } else {
+                val editFormFragment =
+                    EditFormFragment.newInstance(FragmentStates.documents_page.name)
+                gotoFragment(editFormFragment)
+            }
         }
         viewModel?.logoutData?.observe(viewLifecycleOwner) {
             if (it) {
@@ -61,6 +85,9 @@ class StepsFragment : Fragment() {
         }
         binding?.logout?.setOnClickListener {
             viewModel?.logout()
+        }
+        binding?.clearPhoneNo?.setOnClickListener {
+            SharedPreferences.addString(SharedPreferences.phone_no, null)
         }
     }
 

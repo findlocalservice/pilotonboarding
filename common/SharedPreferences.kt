@@ -5,6 +5,8 @@ import android.content.SharedPreferences
 
 object SharedPreferences {
 
+    const val phone_no = "phone_no"
+
     private lateinit var sharedPreferences: SharedPreferences
     fun initialize(context: Context) {
         sharedPreferences = context.getSharedPreferences("application_settings", Context.MODE_PRIVATE)

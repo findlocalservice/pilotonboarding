@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.servicefinder.pilotonboarding.GlobalViewModelFactory
 import com.servicefinder.pilotonboarding.R
 import com.servicefinder.pilotonboarding.common.Resource
+import com.servicefinder.pilotonboarding.common.SharedPreferences
 import com.servicefinder.pilotonboarding.databinding.FragmentEditformBinding
 import com.servicefinder.pilotonboarding.documents.DocumentUploadFragment
 import com.servicefinder.pilotonboarding.form.profile.ProfilePictureFragment
@@ -43,6 +44,7 @@ class EditFormFragment : Fragment() {
                 Resource.Status.SUCCESS ->{
                     binding?.progressBar?.visibility = View.GONE
                     if(it.data==true){
+                        SharedPreferences.addString(SharedPreferences.phone_no, binding?.phoneNo?.text?.trim()?.toString())
                         goToStep()
                     }else{
                         state = FragmentStates.start_onboarding.name

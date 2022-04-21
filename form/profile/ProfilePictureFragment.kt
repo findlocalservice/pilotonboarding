@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,14 +16,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.servicefinder.pilotonboarding.GlobalViewModelFactory
 import com.servicefinder.pilotonboarding.R
-import com.servicefinder.pilotonboarding.common.FileUtils
-import com.servicefinder.pilotonboarding.common.ImageUploader
-import com.servicefinder.pilotonboarding.common.PhotoUploader
-import com.servicefinder.pilotonboarding.common.Resource
+import com.servicefinder.pilotonboarding.common.*
 import com.servicefinder.pilotonboarding.databinding.FragmentProofilePictureBinding
 import com.servicefinder.pilotonboarding.documents.DocumentUploadFragment
 import com.servicefinder.pilotonboarding.form.MainViewModel
 import com.servicefinder.pilotonboarding.form.StepsFragment
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -55,6 +54,7 @@ class ProfilePictureFragment : Fragment() {
         viewModel?.profilePictureLiveData?.observe(viewLifecycleOwner){
             when(it.status){
                 Resource.Status.SUCCESS ->{
+                    binding?.progressBar?.visibility = View.GONE
                     if(it.data == true){
                         gotoNextFragment()
                     }else{
@@ -62,9 +62,11 @@ class ProfilePictureFragment : Fragment() {
                     }
                 }
                 Resource.Status.ERROR ->{
+                    binding?.progressBar?.visibility = View.GONE
                     Toast.makeText(context, "something went wrong", Toast.LENGTH_SHORT).show()
                 }
                 Resource.Status.LOADING ->{
+                    binding?.progressBar?.visibility = View.VISIBLE
 
                 }
             }
@@ -107,11 +109,7 @@ class ProfilePictureFragment : Fragment() {
                             val cursor =
                                 context?.contentResolver?.query(uri, filePath1, null, null, null)
                             cursor?.moveToFirst();
-                            val columnIndex: Int? = cursor?.getColumnIndex(filePath1.get(0))
-                            val picturePath: String? = columnIndex?.let { cursor?.getString(it) }
                             cursor?.close()
-                            val thumbnail = BitmapFactory.decodeFile(picturePath)
-                            binding?.imageView?.setImageBitmap(thumbnail)
                             val filePath = context?.let { FileUtils.getPath(context, uri) } ?: ""
                             val file = File(filePath)
                             val resolver = requireContext().contentResolver
@@ -123,12 +121,21 @@ class ProfilePictureFragment : Fragment() {
                             }
                             resolver.openFileDescriptor(uri, readOnlyMode).use { pfd ->
                                 val inputStream = FileInputStream(pfd?.fileDescriptor)
-                                val newFile = File(
+                                var newFile = File(
                                     requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
                                     file.name
                                 )
                                 val outputStream = FileOutputStream(newFile)
                                 inputStream.copyTo(outputStream)
+                                if(newFile.length() > ImageCompressor.uploadSize){
+                                    runBlocking {
+                                        try{
+                                            newFile = ImageCompressor.compressImage(newFile, ImageCompressor.uploadSize)
+                                        }catch (ex: Exception){
+                                            Log.i("PROFILEPICTUREFRAGMENT", "IMAGE CRASHED")
+                                        }
+                                    }
+                                }
                                 photoFile = newFile
                                 val bitmap = BitmapFactory.decodeFile(newFile.path)
                                 binding?.imageView?.setImageBitmap(bitmap)

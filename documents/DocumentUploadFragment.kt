@@ -16,11 +16,13 @@ import androidx.lifecycle.ViewModelProvider
 import com.servicefinder.pilotonboarding.GlobalViewModelFactory
 import com.servicefinder.pilotonboarding.R
 import com.servicefinder.pilotonboarding.common.FileUtils
+import com.servicefinder.pilotonboarding.common.ImageCompressor
 import com.servicefinder.pilotonboarding.common.Resource
 import com.servicefinder.pilotonboarding.databinding.FragmentDocumentBinding
 import com.servicefinder.pilotonboarding.form.MainViewModel
 import com.servicefinder.pilotonboarding.form.StepsFragment
 import com.servicefinder.pilotonboarding.form.profile.ProfilePictureFragment
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -92,7 +94,6 @@ class DocumentUploadFragment : Fragment() {
         if (phoneNo == null
             || binding?.documentName?.selectedItem == null
             || binding?.documentType?.selectedItem == null
-            || binding?.documentId?.text == null
             || photoFile == null
         ) {
             return false
@@ -129,12 +130,21 @@ class DocumentUploadFragment : Fragment() {
                             }
                             resolver.openFileDescriptor(uri, readOnlyMode).use { pfd ->
                                 val inputStream = FileInputStream(pfd?.fileDescriptor)
-                                val newFile = File(
+                                var newFile = File(
                                     requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
                                     file.name
                                 )
                                 val outputStream = FileOutputStream(newFile)
                                 inputStream.copyTo(outputStream)
+                                if(newFile.length() > ImageCompressor.uploadSize){
+                                    runBlocking {
+                                        try{
+                                           newFile =  ImageCompressor.compressImage(newFile, ImageCompressor.uploadSize)
+                                        }catch (ex: Exception){
+
+                                        }
+                                    }
+                                }
                                 photoFile = newFile
                                 val bitmap = BitmapFactory.decodeFile(newFile.path)
                                 binding?.imageview?.setImageBitmap(bitmap)
